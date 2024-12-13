@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom gradient background with animation */
+        @keyframes gradientShift {
+            0% {
+                background: linear-gradient(to top right, #87CEEB, #D8B7DD, #ffb6ca);
+            }
+            50% {
+                background: linear-gradient(to top right, #D8B7DD, #FFB6C1, #87CEEB);
+            }
+            100% {
+                background: linear-gradient(to top right, #FFB6C1, #87CEEB, #D8B7DD);
+            }
+        }
+
+        body {
+            animation: gradientShift 10s ease infinite;
+            background-size: 400% 400%;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 90%;
+            max-width: 1200px;
+            gap: 30px;
+        }
+
+        .left-section, .right-section {
+            width: 100%;
+            max-width: 48%;
+        }
+
+        .left-section {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #weather-display {
+            transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+        }
+
+        .hidden {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .forecast-card {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: linear-gradient(to bottom right, #f0e6f6, #d8c2d9);
+        }
+
+        .forecast-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .forecast-card img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .forecast-card p {
+            margin-top: 10px;
+            color: #1f1d1d;
+        }
+
+        #forecast-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        button {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(68, 124, 255, 0.8);
+        }
+
+        #weather-display {
+            background: linear-gradient(to bottom right, #D8B7DD, #FFB6C1);
+            color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+        }
+
+        #forecast-container .forecast-card {
+            background: linear-gradient(to bottom right, #f0e6f6, #d8c2d9);
+            width: 100%;
+            aspect-ratio: 1;
+        }
+
+        #weather-display h2,
+        #weather-display p {
+            color: #16032e;
+        }
+
+        /* Loading Spinner Style */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body class="font-sans text-gray-800">
+    <div class="container mx-auto p-8 fade-in">
+        <div class="main-container">
+            <div class="left-section">
+                <h1 class="text-center text-4xl font-semibold text-gray-900 mb-6">Weather Dashboard</h1>
+                <label for="city-input" class="block text-lg font-medium text-gray-700 mb-2">Enter a City Name</label>
+                <div class="relative">
+                    <input id="city-input" type="text" placeholder="E.g., New York, London, Tokyo"
+                        class="w-full p-4 pl-10 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300 ease-in-out" 
+                        aria-label="Enter city name">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                </div>
+                <div class="flex space-x-4">
+                    <button id="search-btn"
+                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300" 
+                        aria-label="Search weather for the entered city">
+                        Search
+                    </button>
+                    <button id="current-location-btn"
+                        class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300" 
+                        aria-label="Use current location to get weather">
+                        Use Current Location
+                    </button>
+                </div>
+            </div>
+
+            <div class="right-section">
+                <!-- Loading Spinner -->
+                <div id="loading-spinner" class="spinner hidden"></div>
+
+                <div id="weather-display" class="bg-blue-600 text-white p-6 rounded-lg shadow-lg hidden">
+                    <h2 id="location-name" class="text-2xl font-semibold mb-4"></h2>
+                    <div class="flex items-center mb-4">
+                        <img id="weather-icon" src="" alt="Weather Icon" class="w-16 h-16 mr-4">
+                        <p id="temperature" class="text-2xl font-bold"></p>
+                    </div>
+                    <p id="humidity" class="text-sm mb-2"><i class="fas fa-tint"></i> Humidity: </p>
+                    <p id="wind-speed" class="text-sm"><i class="fas fa-wind"></i> Wind Speed: </p>
+                </div>
+
+                <div id="forecast-container" class="grid grid-cols-3 gap-4 mt-6">
+                    <!-- Forecast cards will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
